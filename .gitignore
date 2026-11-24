@@ -56,3 +56,9 @@ Thumbs.db
 
 # Vercel build output copied to root (generated)
 /public
+
+# Bundled API for Vercel (generated)
+/server-dist
+
+# Bundled API for Vercel (generated)
+/server-dist

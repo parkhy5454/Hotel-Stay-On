@@ -1,6 +1,6 @@
 {
   "framework": null,
-  "buildCommand": "pnpm --filter @workspace/stay-on run build && rm -rf public && cp -r artifacts/stay-on/dist/public public",
+  "buildCommand": "pnpm --filter @workspace/stay-on run build && pnpm --filter @workspace/api-server run build:vercel && rm -rf public && cp -r artifacts/stay-on/dist/public public",
   "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
