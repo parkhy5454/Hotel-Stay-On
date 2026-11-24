@@ -1,0 +1,1 @@
+- [Clerk web SDK compatibility](clerk-web-sdk-compatibility.md) — verify runtime exports across Clerk React and shared packages, not only TypeScript.

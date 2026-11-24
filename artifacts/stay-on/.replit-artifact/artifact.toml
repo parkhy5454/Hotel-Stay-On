@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "스테이온"
+description = "호텔과 모텔 파트너가 객실을 등록하고, 여행객이 숙소를 검색해 예약할 수 있는 한국어 숙박 플랫폼입니다."
+version = "1.0.0"
+id = "artifacts/stay-on"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19534
+
+[services.development]
+run = "pnpm --filter @workspace/stay-on run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/stay-on", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/stay-on/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19534"
+BASE_PATH = "/"
