@@ -43,7 +43,7 @@ const clerkAppearance = {
     fontFamily: "'DM Sans', sans-serif", borderRadius: '1rem',
   },
   elements: {
-    rootBox: 'w-full flex justify-center', cardBox: 'bg-[#fffdf8] rounded-2xl w-[440px] max-w-full overflow-hidden',
+    rootBox: 'w-full flex justify-center', cardBox: 'bg-[#fffdf8] rounded-2xl w-full max-w-[440px]',
     card: '!shadow-none !border-0 !bg-transparent !rounded-none', footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
     headerTitle: 'text-[#25322f] font-bold', headerSubtitle: 'text-[#718079]', socialButtonsBlockButtonText: 'text-[#25322f]',
     formFieldLabel: 'text-[#25322f]', footerActionLink: 'text-[#315f55]', footerActionText: 'text-[#718079]',
@@ -348,10 +348,10 @@ function PartnerRoute() {
   return <><Show when="signed-in"><PartnerDashboard/></Show><Show when="signed-out"><Redirect to="/sign-in"/></Show></>;
 }
 function SignInPage() {
-  return <main className="grid min-h-[100dvh] place-items-center bg-[#eef1e9] px-4 py-10"><div className="absolute left-6 top-6"><Brand/></div><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`}/></main>;
+  return <main className="grid min-h-[100dvh] place-items-center bg-[#eef1e9] px-4 py-10"><div className="absolute left-6 top-6"><Brand/></div><div className="w-full max-w-[440px]"><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`}/></div></main>;
 }
 function SignUpPage() {
-  return <main className="grid min-h-[100dvh] place-items-center bg-[#eef1e9] px-4 py-10"><div className="absolute left-6 top-6"><Brand/></div><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`}/></main>;
+  return <main className="grid min-h-[100dvh] place-items-center bg-[#eef1e9] px-4 py-10"><div className="absolute left-6 top-6"><Brand/></div><div className="w-full max-w-[440px]"><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`}/></div></main>;
 }
 function ClerkQueryClientCacheInvalidator() {
   const { addListener } = useClerk();
