@@ -43,8 +43,8 @@ const clerkAppearance = {
     fontFamily: "'DM Sans', sans-serif", borderRadius: '1rem',
   },
   elements: {
-    rootBox: 'w-full flex justify-center', cardBox: 'bg-[#fffdf8] rounded-2xl w-full max-w-[440px]',
-    card: '!shadow-none !border-0 !bg-transparent !rounded-none', footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
+    rootBox: 'w-full flex justify-center', cardBox: 'bg-[#fffdf8] rounded-3xl w-full max-w-[440px] !overflow-visible',
+    card: '!shadow-none !border-0 !bg-transparent !rounded-none !px-8 !py-10 !w-full', footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
     headerTitle: 'text-[#25322f] font-bold', headerSubtitle: 'text-[#718079]', socialButtonsBlockButtonText: 'text-[#25322f]',
     formFieldLabel: 'text-[#25322f]', footerActionLink: 'text-[#315f55]', footerActionText: 'text-[#718079]',
     dividerText: 'text-[#718079]', identityPreviewEditButton: 'text-[#315f55]', formFieldSuccessText: 'text-[#315f55]',
