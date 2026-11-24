@@ -1,0 +1,475 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: stays
+    description: Public stay search and details
+  - name: bookings
+    description: Guest reservation requests
+  - name: partners
+    description: Hotel and motel partner operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /stays:
+    get:
+      operationId: listStays
+      tags: [stays]
+      summary: Search listed stays
+      parameters:
+        - in: query
+          name: city
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string, enum: [hotel, motel, pension] }
+        - in: query
+          name: guests
+          schema: { type: integer, minimum: 1, default: 2 }
+        - in: query
+          name: minPrice
+          schema: { type: integer, minimum: 0 }
+        - in: query
+          name: maxPrice
+          schema: { type: integer, minimum: 0 }
+        - in: query
+          name: checkIn
+          schema: { type: string, format: date }
+        - in: query
+          name: checkOut
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: Matching stays
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/StaySummary" }
+  /stays/{id}:
+    get:
+      operationId: getStay
+      tags: [stays]
+      summary: Get stay details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Stay details and room types
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StayDetail" }
+        "404":
+          description: Stay not found
+  /bookings:
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a reservation request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingInput" }
+      responses:
+        "201":
+          description: Reservation created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BookingConfirmation" }
+        "400":
+          description: Invalid request or unavailable room
+  /bookings/{code}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Look up a reservation by confirmation code
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Reservation status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BookingConfirmation" }
+        "404":
+          description: Reservation not found
+  /partner/register:
+    post:
+      operationId: registerPartner
+      tags: [partners]
+      summary: Register a hotel or motel partner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerInput" }
+      responses:
+        "201":
+          description: Partner profile created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProfile" }
+        "401":
+          description: Sign-in required
+        "409":
+          description: Partner profile already exists
+  /partner/me:
+    get:
+      operationId: getPartnerProfile
+      tags: [partners]
+      summary: Get the signed-in partner profile
+      responses:
+        "200":
+          description: Partner profile
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProfile" }
+        "401":
+          description: Sign-in required
+        "404":
+          description: Partner registration required
+  /partner/stays:
+    get:
+      operationId: listPartnerStays
+      tags: [partners]
+      summary: List the partner's stays and room types
+      responses:
+        "200":
+          description: Partner listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PartnerStay" }
+        "401":
+          description: Sign-in required
+    post:
+      operationId: createPartnerStay
+      tags: [partners]
+      summary: Create a stay and initial room type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerStayInput" }
+      responses:
+        "201":
+          description: Stay created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerStay" }
+        "401":
+          description: Sign-in required
+        "403":
+          description: Partner registration required
+  /partner/stays/{id}:
+    patch:
+      operationId: updatePartnerStay
+      tags: [partners]
+      summary: Update a stay or its room details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerStayUpdate" }
+      responses:
+        "200":
+          description: Updated stay
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerStay" }
+        "401":
+          description: Sign-in required
+        "404":
+          description: Stay not found
+  /partner/stays/{id}/rooms:
+    post:
+      operationId: createPartnerRoom
+      tags: [partners]
+      summary: Add a room type to a partner's stay
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RoomInput" }
+      responses:
+        "201":
+          description: Room type created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RoomType" }
+        "401":
+          description: Sign-in required
+        "404":
+          description: Stay not found
+  /partner/rooms/{id}:
+    patch:
+      operationId: updatePartnerRoom
+      tags: [partners]
+      summary: Update room price, capacity, inventory, or amenities
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RoomUpdate" }
+      responses:
+        "200":
+          description: Updated room type
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RoomType" }
+        "401":
+          description: Sign-in required
+        "404":
+          description: Room type not found
+  /partner/bookings:
+    get:
+      operationId: listPartnerBookings
+      tags: [partners]
+      summary: View reservation requests for the partner's stays
+      responses:
+        "200":
+          description: Partner reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PartnerBooking" }
+        "401":
+          description: Sign-in required
+  /partner/bookings/{id}:
+    patch:
+      operationId: updatePartnerBooking
+      tags: [partners]
+      summary: Confirm or cancel a reservation request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingStatusInput" }
+      responses:
+        "200":
+          description: Updated reservation
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerBooking" }
+        "401":
+          description: Sign-in required
+        "404":
+          description: Reservation not found
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    RoomType:
+      type: object
+      required: [id, name, pricePerNight, capacity, inventory, amenities]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        pricePerNight: { type: integer }
+        capacity: { type: integer }
+        inventory: { type: integer }
+        amenities:
+          type: array
+          items: { type: string }
+    RoomInput:
+      type: object
+      required: [name, pricePerNight, capacity, inventory, amenities]
+      properties:
+        name: { type: string, minLength: 2 }
+        pricePerNight: { type: integer, minimum: 1000 }
+        capacity: { type: integer, minimum: 1 }
+        inventory: { type: integer, minimum: 1 }
+        amenities:
+          type: array
+          items: { type: string }
+    RoomUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 2 }
+        pricePerNight: { type: integer, minimum: 1000 }
+        capacity: { type: integer, minimum: 1 }
+        inventory: { type: integer, minimum: 1 }
+        amenities:
+          type: array
+          items: { type: string }
+    StaySummary:
+      type: object
+      required: [id, name, city, address, category, description, imageUrl, rating, reviewCount, rooms]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        city: { type: string }
+        address: { type: string }
+        category: { type: string, enum: [hotel, motel, pension] }
+        description: { type: string }
+        imageUrl: { type: string }
+        rating: { type: number }
+        reviewCount: { type: integer }
+        rooms:
+          type: array
+          items: { $ref: "#/components/schemas/RoomType" }
+    StayDetail:
+      allOf:
+        - $ref: "#/components/schemas/StaySummary"
+        - type: object
+          required: [checkInTime, checkOutTime, ownerName]
+          properties:
+            checkInTime: { type: string }
+            checkOutTime: { type: string }
+            ownerName: { type: string }
+    BookingInput:
+      type: object
+      required: [roomId, checkIn, checkOut, guests, guestName, guestEmail, guestPhone]
+      properties:
+        roomId: { type: integer }
+        checkIn: { type: string, format: date }
+        checkOut: { type: string, format: date }
+        guests: { type: integer, minimum: 1 }
+        guestName: { type: string, minLength: 1 }
+        guestEmail: { type: string, format: email }
+        guestPhone: { type: string, minLength: 7 }
+    BookingConfirmation:
+      type: object
+      required: [code, stayName, roomName, checkIn, checkOut, guests, totalPrice, status]
+      properties:
+        code: { type: string }
+        stayName: { type: string }
+        roomName: { type: string }
+        checkIn: { type: string, format: date }
+        checkOut: { type: string, format: date }
+        guests: { type: integer }
+        totalPrice: { type: integer }
+        status: { type: string, enum: [requested, confirmed, cancelled] }
+    PartnerInput:
+      type: object
+      required: [businessName, ownerName, phone]
+      properties:
+        businessName: { type: string, minLength: 2 }
+        ownerName: { type: string, minLength: 2 }
+        phone: { type: string, minLength: 7 }
+        businessNumber: { type: string }
+    PartnerProfile:
+      type: object
+      required: [id, businessName, ownerName, phone, businessNumber, createdAt]
+      properties:
+        id: { type: integer }
+        businessName: { type: string }
+        ownerName: { type: string }
+        phone: { type: string }
+        businessNumber: { type: string }
+        createdAt: { type: string, format: date-time }
+    PartnerStayInput:
+      type: object
+      required: [name, city, address, category, description, imageUrl, roomName, pricePerNight, capacity, inventory, amenities]
+      properties:
+        name: { type: string, minLength: 2 }
+        city: { type: string }
+        address: { type: string }
+        category: { type: string, enum: [hotel, motel, pension] }
+        description: { type: string }
+        imageUrl: { type: string, format: uri }
+        roomName: { type: string }
+        pricePerNight: { type: integer, minimum: 1000 }
+        capacity: { type: integer, minimum: 1 }
+        inventory: { type: integer, minimum: 1 }
+        amenities:
+          type: array
+          items: { type: string }
+    PartnerStayUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 2 }
+        city: { type: string }
+        address: { type: string }
+        category: { type: string, enum: [hotel, motel, pension] }
+        description: { type: string }
+        imageUrl: { type: string, format: uri }
+        roomName: { type: string }
+        pricePerNight: { type: integer, minimum: 1000 }
+        capacity: { type: integer, minimum: 1 }
+        inventory: { type: integer, minimum: 1 }
+        amenities:
+          type: array
+          items: { type: string }
+    PartnerStay:
+      allOf:
+        - $ref: "#/components/schemas/StaySummary"
+        - type: object
+          required: [active]
+          properties:
+            active: { type: boolean }
+    PartnerBooking:
+      type: object
+      required: [id, code, stayName, roomName, guestName, guestEmail, guestPhone, checkIn, checkOut, guests, totalPrice, status]
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        stayName: { type: string }
+        roomName: { type: string }
+        guestName: { type: string }
+        guestEmail: { type: string, format: email }
+        guestPhone: { type: string }
+        checkIn: { type: string, format: date }
+        checkOut: { type: string, format: date }
+        guests: { type: integer }
+        totalPrice: { type: integer }
+        status: { type: string, enum: [requested, confirmed, cancelled] }
+    BookingStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [confirmed, cancelled] }
+

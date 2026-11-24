@@ -1,0 +1,1 @@
+{"version":3,"file":"stayDetail.d.ts","sourceRoot":"","sources":["../../../src/generated/types/stayDetail.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,eAAe,CAAC;AAEjD,MAAM,MAAM,UAAU,GAAG,WAAW,GAAG;IACrC,WAAW,EAAE,MAAM,CAAC;IACpB,YAAY,EAAE,MAAM,CAAC;IACrB,SAAS,EAAE,MAAM,CAAC;CACnB,CAAC"}
