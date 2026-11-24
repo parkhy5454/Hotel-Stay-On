@@ -1,0 +1,9 @@
+{
+  "framework": null,
+  "buildCommand": "pnpm --filter @workspace/stay-on run build",
+  "outputDirectory": "artifacts/stay-on/dist/public",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
